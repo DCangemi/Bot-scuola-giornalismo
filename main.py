@@ -9,7 +9,7 @@ from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
     ContextTypes, filters
 )
-from stay_alive import keep_alive
+#from stay_alive import keep_alive
 
 logging.basicConfig(
     level=logging.INFO,
