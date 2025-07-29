@@ -67,7 +67,7 @@ async def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
 
-    webhook_url = f"{RENDER_URL}/{TOKEN}"
+    webhook_url = f"{RENDER_EXTERNAL_URL}/{TOKEN}"
 
     await app.run_webhook(
         listen="0.0.0.0",
