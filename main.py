@@ -41,6 +41,8 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("📍 We're located at 123 Sunshine Ave, Palermo.")
     elif "book" in text:
         await update.message.reply_text("📅 You can book a tour at https://example.com/book")
+    elif "palla" in text:
+        await update.message.reply_text("yeah should be working")
     else:
         await update.message.reply_text("🤖 I'm still learning! Try asking about hours or booking.")
 
