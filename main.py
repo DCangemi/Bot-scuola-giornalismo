@@ -53,11 +53,31 @@ app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
 
-# Make it run in Replit
-nest_asyncio.apply()
+WEBHOOK_PATH = "/webhook"
+PORT = int(os.environ.get("PORT", 8443))
+RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")  # You will define this in env vars
 
-async def run():
-    await app.run_polling()
-    logging.info("Bot polling started.")
+async def main():
+    application = (
+        ApplicationBuilder()
+        .token(TOKEN)
+        .webhook_path(WEBHOOK_PATH)
+        .build()
+    )
 
-asyncio.run(run())
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
+
+    await application.bot.set_webhook(f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}")
+
+    # Start webhook server
+    await application.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=f"{RENDER_EXTERNAL_URL}{WEBHOOK_PATH}",
+    )
+
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(main())
+
