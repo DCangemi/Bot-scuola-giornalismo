@@ -43,6 +43,8 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("📅 You can book a tour at https://example.com/book")
     elif "palla" in text:
         await update.message.reply_text("yeah should be working")
+    elif "joker" in text:
+        await update.message.reply_text("what we doin")
     else:
         await update.message.reply_text("🤖 I'm still learning! Try asking about hours or booking.")
 
