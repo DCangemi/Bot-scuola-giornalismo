@@ -1,10 +1,9 @@
 services:
 - type: web
   name: telegram-bot
-  env: python
   plan: free
-  buildCommand: ./render/setup.sh
-  startCommand: python main.py
+  env: docker
+  dockerfilePath: ./Dockerfile
   envVars:
     - key: BOT_TOKEN
       value: 7671860820:AAHJBbVvbl8Rk64CVsLEV-JbQhZAUVWc_X0
