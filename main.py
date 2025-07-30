@@ -1,5 +1,7 @@
+import asyncio
 import os
 import logging
+import nest_asyncio
 from dotenv import load_dotenv
 
 from telegram import Update
@@ -7,28 +9,32 @@ from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
     ContextTypes, filters
 )
+from stay_alive import keep_alive
 
-# Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s'
 )
 
-# Suppress noisy logs
+# Suppress httpx logs
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
-# Load environment
+# Load token from .env
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
-PORT = int(os.environ.get("PORT", 8443))
-RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")  # Must be set in Render's Environment Variables
 
-# Handlers
+# Define command handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("👋 Hello! I’m your assistant receptionist bot. How can I help you today?")
+    logging.info("Received /start")
+    await update.message.reply_text(
+        "👋 Hello! I’m your assistant receptionist bot. How can I help you today?"
+    )
 
+# Define message handler
 async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.lower()
+    logging.info(f"Received message: {text}")
+
     if "hours" in text:
         await update.message.reply_text("🕒 We're open from 9:00 AM to 6:00 PM.")
     elif "location" in text:
@@ -42,16 +48,18 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("🤖 I'm still learning! Try asking about hours or booking.")
 
-# Build app and run webhook server
+# Build app
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
 
-webhook_url = f"{RENDER_EXTERNAL_URL}/{TOKEN}"
+# Make it run in Replit
+nest_asyncio.apply()
 
-# This runs the webhook directly without asyncio.run()
-app.run_webhook(
-    listen="0.0.0.0",
-    port=PORT,
-    webhook_url=webhook_url
-)
+async def run():
+    await app.run_polling()
+    logging.info("Bot polling started.")
+
+keep_alive()
+
+asyncio.run(run())
